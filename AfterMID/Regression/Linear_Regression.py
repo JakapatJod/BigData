@@ -66,6 +66,10 @@ evaluator = RegressionEvaluator(
     predictionCol="prediction"
 )
 
+print()
+print('='*50)
+print()
+
 # MSE ใกล้เคียงกับ 0 ดีสุด
 # ประเมิน Mean Squared Error (MSE)
 evaluator.setMetricName("mse")
@@ -77,6 +81,9 @@ print(f"Mean Squared Error (MSE): {mse}")
 evaluator.setMetricName("r2")
 r2 = evaluator.evaluate(predictions)
 print(f"R-squared (R2): {r2}")
+print()
+print('='*50)
+print()
 
 # ขั้นตอนที่ 11: เลือกคอลัมน์และแปลงประเภท, เรียงลำดับตาม 'prediction' ในลำดับลดลง
 selected_data = predictions.select(
@@ -89,11 +96,10 @@ selected_data_pd = selected_data.toPandas()
 
 # ขั้นตอนที่ 12: การสร้างกราฟโดยใช้ Seaborn's lmplot
 plt.figure(figsize=(12, 6))
-sns.lmplot(
+sns.regplot(
     data=selected_data_pd,
     x='num_loves',
     y='prediction',
-    aspect=1.5,  # สัดส่วนของกราฟ
     scatter_kws={'s': 50, 'alpha': 0.5},  # กำหนดคุณสมบัติของจุดในกราฟ
     line_kws={'color': 'red'}  # กำหนดคุณสมบัติของเส้นในกราฟ
 )

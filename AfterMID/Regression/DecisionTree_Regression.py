@@ -55,4 +55,12 @@ evaluator = RegressionEvaluator(labelCol="num_loves_ind", predictionCol="predict
 
 # คำนวณคะแนน R2
 r2 = evaluator.setMetricName("r2").evaluate(predictions)
+print()
+print('='*50)
+print()
 print(f"R2: {r2}")
+print()
+print('='*50)
+print()
+
+spark.stop()

@@ -55,7 +55,9 @@ evaluator = MulticlassClassificationEvaluator(
     labelCol="status_type_ind",    # คอลัมน์ label
     predictionCol="prediction"      # คอลัมน์ prediction
 )
-
+print()
+print('='*50)
+print()
 # คำนวณความแม่นยำของโมเดล
 accuracy = evaluator.evaluate(predictions, {evaluator.metricName: "accuracy"})
 print(f"Accuracy: {accuracy}")
@@ -71,6 +73,9 @@ print(f"Recall: {recall}")
 # คำนวณ F1 Score
 f1 = evaluator.evaluate(predictions, {evaluator.metricName: "f1"})
 print(f"F1 Score: {f1}")
+print()
+print('='*50)
+print()
 
 # หยุด SparkSession
 spark.stop()

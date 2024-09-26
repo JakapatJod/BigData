@@ -62,6 +62,9 @@ f1 = evaluator.evaluate(predictions, {evaluator.metricName: "f1"})
 
 test_error = 1.0 - accuracy
 # คำนวณค่า Test Error โดยการลบความแม่นยำจาก 1
+print()
+print('='*50)
+print()
 
 print(f"Accuracy: {accuracy}")
 # แสดงผลความแม่นยำ
@@ -77,5 +80,8 @@ print(f"F1 Measure: {f1}")
 
 print(f"Test Error: {test_error}")
 # แสดงผลค่า Test Error
+print()
+print('='*50)
+print()
 
 spark.stop()
