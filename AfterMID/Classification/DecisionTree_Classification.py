@@ -5,7 +5,6 @@ from pyspark.ml.evaluation import MulticlassClassificationEvaluator
 from pyspark.ml import Pipeline
 
 spark = SparkSession.builder.appName("DecisionTree_Classification").getOrCreate()
-# สร้าง SparkSession และตั้งชื่อแอปพลิเคชันว่า "DecisionTree_Classification"
 
 data = spark.read.csv("fb_live_thailand.csv", header=True, inferSchema=True)
 # โหลดข้อมูลจากไฟล์ CSV เข้าสู่ DataFrame โดยมีแถวแรกเป็นชื่อคอลัมน์ และให้ Spark ตรวจจับประเภทข้อมูลอัตโนมัติ
@@ -78,3 +77,5 @@ print(f"F1 Measure: {f1}")
 
 print(f"Test Error: {test_error}")
 # แสดงผลค่า Test Error
+
+spark.stop()
