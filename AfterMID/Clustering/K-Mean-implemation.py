@@ -9,9 +9,9 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 # Creating the SparkSession
-spark = SparkSession.builder.appName("testKMeans").get0rCreate()
+spark = SparkSession.builder.appName("KMeans").getOrCreate()
 
-df = spark.read.format("csv").option("header",True).load("data/fb_live_thailand.csv") 
+df = spark.read.format("csv").option("header",True).load("fb_live_thailand.csv") 
 
 df = df.select(df.num_sads.cast(DoubleType()),df.num_reactions.cast(DoubleType()))
 
