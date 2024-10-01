@@ -7,9 +7,10 @@ from pyspark.sql.functions import desc
 spark = SparkSession.builder \
     .appName("Graph Analytics") \
     .config("spark.jars.packages", "graphframes:graphframes:0.8.2-spark3.0-s_2.12") \
-    .config("spark.executor.memory", "16g") \
-    .config("spark.driver.memory", "16g") \
+    .config("spark.executor.memory", "4g") \
+    .config("spark.driver.memory", "4g") \
     .getOrCreate()
+
 
 # Create vertices and edges DataFrames
 vertices_data = [
