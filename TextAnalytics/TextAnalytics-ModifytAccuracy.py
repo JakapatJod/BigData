@@ -5,11 +5,14 @@ from pyspark.ml.feature import HashingTF, Tokenizer, StopWordsRemover  # เค�
 from pyspark.ml import Pipeline  # ใช้สำหรับสร้าง Pipeline สำหรับขั้นตอนการประมวลผล
 from pyspark.ml.classification import LogisticRegression  # โมเดล Logistic Regression สำหรับการจำแนกประเภท
 from pyspark.ml.evaluation import MulticlassClassificationEvaluator  # ตัวประเมินผลสำหรับคำนวณความแม่นยำของโมเดล
+from pyspark.ml.tuning import CrossValidator, ParamGridBuilder  # สำหรับปรับแต่งพารามิเตอร์ด้วย Cross-Validation
 
 # สร้าง Spark session
 spark = SparkSession.builder \
-    .appName("TextClassification") \
-    .getOrCreate() 
+    .appName("Text Classification") \
+    .config("spark.executor.memory", "8g")\
+    .config("spark.driver.memory", "8g")\
+    .getOrCreate()  
 
 # อ่านข้อมูลจากไฟล์ CSV
 file_path = "reviews_rated.csv"  # กำหนดเส้นทางของไฟล์ CSV
@@ -67,11 +70,24 @@ train_df.show(truncate=False)  # แสดงข้อมูลชุดฝึ�
 # Logistic Regression
 lr = LogisticRegression(labelCol="Rating", featuresCol="features")  # สร้างโมเดล Logistic Regression
 
-# ฝึกโมเดลด้วย DataFrame ชุดฝึก
-lr_model = lr.fit(train_df)  # ฝึกโมเดล Logistic Regression ด้วยข้อมูลชุดฝึก
+# สร้าง Grid ของพารามิเตอร์
+paramGrid = ParamGridBuilder() \
+    .addGrid(lr.maxIter, [10, 20]) \
+    .addGrid(lr.regParam, [0.1, 0.01]) \
+    .addGrid(lr.elasticNetParam, [0.0, 0.5]) \
+    .build()
 
-# แปลงข้อมูลชุดทดสอบโดยใช้โมเดลที่ฝึกแล้ว
-predictions = lr_model.transform(test_df)  # ทำการทำนายชุดทดสอบ
+# สร้าง CrossValidator
+crossval = CrossValidator(estimator=lr,  # โมเดลที่ต้องการปรับแต่ง
+                          estimatorParamMaps=paramGrid,  # พารามิเตอร์ที่ต้องการทดสอบ
+                          evaluator=MulticlassClassificationEvaluator(labelCol="Rating", predictionCol="prediction", metricName="accuracy"),  # ตัวประเมินผล
+                          numFolds=5)  # จำนวน folds สำหรับ cross-validation
+
+# ฝึกโมเดลด้วย CrossValidator
+cv_model = crossval.fit(train_df)  # ฝึกโมเดลด้วยข้อมูลชุดฝึก
+
+# ทำนายข้อมูลชุดทดสอบ
+predictions = cv_model.transform(test_df)  # ทำการทำนายชุดทดสอบ
 
 # แสดง MeaningfulWords, Rating (label) และ Prediction
 predictions.select("MeaningfulWords", "Rating", "prediction").show(truncate=False)  # แสดงคำที่มีความหมาย, ค่าจริงของเรตติ้ง, และค่าที่ทำนายได้
@@ -82,14 +98,16 @@ evaluator = MulticlassClassificationEvaluator(
     predictionCol="prediction",  # ระบุคอลัมน์ของการทำนาย
     metricName="accuracy"  # กำหนดค่าที่ต้องการวัดเป็นความแม่นยำ (accuracy)
 )
-
-# ประเมินความแม่นยำของโมเดล
-accuracy = evaluator.evaluate(predictions)  # คำนวณความแม่นยำของโมเดลบนข้อมูลชุดทดสอบ
-
 print('')
 print('='*80)
 print('')
+# ประเมินความแม่นยำของโมเดล
+accuracy = evaluator.evaluate(predictions)  # คำนวณความแม่นยำของโมเดลบนข้อมูลชุดทดสอบ
 print(f"Model Accuracy: {accuracy:.4f}")  # แสดงค่าความแม่นยำ
+
+# แสดงความแม่นยำของโมเดลที่ใช้ Cross-Validation
+cv_accuracy = evaluator.evaluate(predictions)  # คำนวณความแม่นยำ
+print(f"Cross-Validated Model Accuracy: {cv_accuracy:.4f}")  # แสดงค่าความแม่นยำ
 print('')
 print('='*80)
 print('')
