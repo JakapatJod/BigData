@@ -6,7 +6,6 @@ from pyspark.ml import Pipeline  # ใช้สำหรับสร้าง Pi
 from pyspark.ml.classification import LogisticRegression  # โมเดล Logistic Regression สำหรับการจำแนกประเภท
 from pyspark.ml.evaluation import MulticlassClassificationEvaluator  # ตัวประเมินผลสำหรับคำนวณความแม่นยำของโมเดล
 
-# สร้าง Spark session
 spark = SparkSession.builder \
     .appName("TextClassification") \
     .getOrCreate() 
