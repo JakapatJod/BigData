@@ -45,6 +45,16 @@ grouped_edges = graph.edges.groupBy("src", "dst").count() \
     .withColumn("source_color", lit("#3358FF")) \
     .withColumn("destination_color", lit("#FF3F33"))
 
+# คำสั่ง groupBy("src", "dst").count() ใช้ในการนับจำนวนการเชื่อมต่อระหว่างสนามบินต้นทางและปลายทาง
+# มีการใช้คำสั่ง .filter(col("count") > 5) เพื่อกรองเส้นทางที่มีการบินซ้ำมากกว่า 5 ครั้ง
+# คำสั่ง .orderBy(desc("count")) ทำการเรียงลำดับจากมากไปน้อย
+# ส่วนสี (source_color, destination_color) ถูกเพิ่มเข้าไปใน DataFrame เพื่อใช้ในงานแสดงผล เช่น การวิเคราะห์กราฟขั้นสูง หรือการ visualizing กราฟ.
+
+# ASC เรียงจากน้อยไปหามาก
+# DESC เรียงจากมากไปหาน้อย
+# orderBY เรียง
+
+
 # แสดงข้อมูลที่ถูกจัดกลุ่ม
 grouped_edges.show()
 

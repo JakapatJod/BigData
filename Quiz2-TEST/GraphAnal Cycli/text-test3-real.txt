@@ -1,0 +1,33 @@
+เพิ่มเติม
+
+from pyspark.sql.functions import hour, dayofweek
+
+# สร้างคอลัมน์ชั่วโมงและวันจากวันที่เดินทาง
+cycling_routes_df = cycling_routes_df.withColumn("hour", hour("start_time")) \
+                                     .withColumn("day", dayofweek("start_time"))
+
+# วิเคราะห์ปริมาณการใช้งานในแต่ละชั่วโมง
+hourly_usage = cycling_routes_df.groupBy("hour").count().orderBy("hour")
+
+# วิเคราะห์ปริมาณการใช้งานในแต่ละวันของสัปดาห์
+daily_usage = cycling_routes_df.groupBy("day").count().orderBy("day")
+
+hourly_usage.show()
+daily_usage.show()
+
+
+
+# หาการเดินทางที่มีการเดินทางย้อนกลับจากปลายทางเดิม
+return_trips = graph.edges.alias("e1").join(graph.edges.alias("e2"), 
+                                            (col("e1.src") == col("e2.dst")) & 
+                                            (col("e1.dst") == col("e2.src")))
+
+return_trips.show()
+
+
+# หาทางเดินทางที่สั้นที่สุดและยาวที่สุด
+shortest_routes = cycling_routes_df.orderBy("distance").limit(10)
+longest_routes = cycling_routes_df.orderBy(desc("distance")).limit(10)
+
+shortest_routes.show()
+longest_routes.show()
