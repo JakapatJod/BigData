@@ -11,7 +11,7 @@ import pandas as pd
 spark = SparkSession.builder.appName("testClustering").getOrCreate()
 
 # df = spark.read.format("csv").option("header",True).load("fb_live_thailand.csv")
-df = spark.read.format("csv").option("header",True).load("fb_live_thailand.csv")
+df = spark.read.csv("fb_live_thailand.csv",header=True, inferSchema=True)
 
 df = df.select(df.num_sads.cast(DoubleType()),df.num_reactions.cast(DoubleType()))
 
@@ -27,7 +27,8 @@ for i in range(2, 5):
     pipeline = Pipeline(stages=[vec_assembler, scaler, kmeans])
     model = pipeline.fit(df)
     output = model.transform(df)
-    evaluator = ClusteringEvaluator(predictionCol="prediction", featuresCol="scaledFeatures", metricName="silhouette", distanceMeasure="squaredEuclidean")
+    evaluator = ClusteringEvaluator(predictionCol="prediction", featuresCol="scaledFeatures", 
+                                    metricName="silhouette", distanceMeasure="squaredEuclidean")
 
     score = evaluator.evaluate(output)
     k_values.append(score)

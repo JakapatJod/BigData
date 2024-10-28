@@ -10,6 +10,8 @@ df = pd.read_csv('year_sales.csv')  # โหลดข้อมูลจากไ
 # Step 4: Convert the 'Year' column to datetime and set it as the index
 df['Year'] = pd.to_datetime(df['Year'])  # แปลงคอลัมน์ Year เป็น datetime
 df.set_index('Year', inplace=True)  # ตั้งคอลัมน์ Year เป็น index ของ DataFrame
+# inplace=False Default DataFrame ใหม่ที่สร้างขึ้นโดยมี Year เป็น index
+# inplace=True จะถูกเปลี่ยนแปลงให้ Year เป็น index ของมันทันที (ไม่มีการสร้าง DataFrame ใหม่)
 
 # Step 5: Plot the data to see the time series
 df.plot()  # แสดงกราฟของข้อมูลเพื่อดูแนวโน้ม
@@ -23,8 +25,11 @@ print(f"ADF Test Result: {adf_result}")  # แสดงผลการทดส�
 
 # Step 7: Split the data into training and testing sets
 train_size = int(len(df) * 0.8)  # กำหนดขนาดของชุดข้อมูลฝึกเป็น 80% ของข้อมูลทั้งหมด
-train = df[:train_size]  # สร้างชุดข้อมูลฝึก
-test = df[train_size:]  # สร้างชุดข้อมูลทดสอบ
+train = df[:train_size]  # สร้างชุดข้อมูลฝึก train จะประกอบด้วยแถวที่ 0 ถึง 79 (80 แถว)
+test = df[train_size:]  # สร้างชุดข้อมูลทดสอบ test จะประกอบด้วยแถวที่ 80 ถึง 99 (20 แถว)
+
+print(train)
+print(test)
 
 # Step 8: Fit the ARIMA model using auto_arima
 model = auto_arima(train, start_p=0, d=1,
@@ -36,19 +41,24 @@ model = auto_arima(train, start_p=0, d=1,
                    stepwise=True, random_state=20,
                    n_fits=50)  # สร้างโมเดล ARIMA โดยใช้ auto_arima พร้อมพารามิเตอร์ที่ระบุ
 
+# สรุป model
+print(model.summary())
+
+
 # Step 9: Forecast future values
 n_periods = len(test)  # จำนวนช่วงเวลาที่จะพยากรณ์เท่ากับขนาดของชุดข้อมูลทดสอบ
 forecast = model.predict(n_periods=n_periods)  # ทำการพยากรณ์ค่าต่อไป
 
 # Step 10: Convert forecast into a DataFrame and assign dates from the test set
-forecast_df = pd.DataFrame(forecast, index=test.index, columns=['Predicted'])  # สร้าง DataFrame สำหรับผลการพยากรณ์
+forecast_df = pd.DataFrame(forecast, index=test.index, columns=['Predicted'])  
+# columns=['Predicted'] สร้าง DataFrame สำหรับผลการพยากรณ์
 
 # Step 11: Plot the training, test, and predicted data
 plt.figure(figsize=(10, 6))  # กำหนดขนาดของกราฟ
 plt.plot(train, label='Train Data')  # แสดงชุดข้อมูลฝึก
 plt.plot(test, label='Test Data')  # แสดงชุดข้อมูลทดสอบ
 plt.plot(forecast_df, label='Predicted Data')  # แสดงผลการพยากรณ์
-plt.legend(loc='best')  # แสดงตำนานในตำแหน่งที่ดีที่สุด
+plt.legend(loc='best')  # แสดงในตำแหน่งที่ดีที่สุด
 plt.title('Train, Test, and Predicted Data')  # ตั้งชื่อกราฟ
 plt.show()  # แสดงกราฟ
 

@@ -36,17 +36,23 @@ assembler = VectorAssembler(
 lr = LinearRegression(
     featuresCol="features",
     labelCol="num_loves_ind",
-    maxIter=10,         # จำนวนรอบการฝึกฝน
+    maxIter=10,         # จำนวนรอบการฝึกฝน 10 รอบ
     regParam=0.1,       # พารามิเตอร์การลดความซับซ้อน
     elasticNetParam=0.8 # ค่าที่ใช้ในการควบคุมระหว่าง L1 และ L2 regularization
 )
 
+# ค่า ElasticNetParam สามารถกำหนดได้ระหว่าง 0 ถึง 1:
+# หากกำหนดค่าเป็น 0 โมเดลจะใช้เฉพาะ L2 Regularization (Ridge) ** เอา Columns มาทั้งหมดแต่ไม่ให้ความสำคัญ
+# หากกำหนดค่าเป็น 1 โมเดลจะใช้เฉพาะ L1 Regularization (Lasso) ** ตัด Columns บ้างส่วนออกไปเลยที่ไม่สำคัญ
+# หากกำหนดค่า ระหว่าง 0 และ 1 โมเดลจะใช้การผสมผสานระหว่าง L1 และ L2 , 0.5 0.8 0.7 ประมาณนี้
+
 # ขั้นตอนที่ 6: สร้าง Pipeline ด้วยแต่ละขั้นตอน
 # ไม่รวม indexer_reactions และ indexer_loves ใน pipeline
-pipeline = Pipeline(stages=[assembler, lr])
+pipeline = Pipeline(stages=[assembler, lr]) # stages=[assembler, lr] ทำงานตามลำดับขั้นตอน
+                                            # assembler --> lr
 
 # ขั้นตอนที่ 7: แบ่งข้อมูลเป็นชุดฝึกและชุดทดสอบ
-train_data, test_data = data.randomSplit([0.8, 0.2], seed=1234)
+train_data, test_data = data.randomSplit([0.8, 0.2], seed=1234) # randomSplit ถ้าไม่มีจะเกิด Overfitting
 
 # ขั้นตอนที่ 8: ฝึกโมเดลด้วยชุดฝึก
 # ใช้ StringIndexers เพื่อแปลงข้อมูลในชุดฝึก
@@ -86,6 +92,9 @@ print('='*50)
 print()
 
 # ขั้นตอนที่ 11: เลือกคอลัมน์และแปลงประเภท, เรียงลำดับตาม 'prediction' ในลำดับลดลง
+# เลือกเฉพาะคอลัมน์ num_loves_ind และ prediction พร้อมแปลงเป็นประเภท Integer 
+# และเรียงข้อมูลตาม prediction ในลำดับลดลง
+
 selected_data = predictions.select(
     col("num_loves_ind").cast(IntegerType()).alias("num_loves"),
     col("prediction").cast(IntegerType()).alias("prediction")
@@ -93,6 +102,7 @@ selected_data = predictions.select(
 
 # แปลงเป็น Pandas DataFrame สำหรับการวิเคราะห์เพิ่มเติม
 selected_data_pd = selected_data.toPandas()
+print(selected_data_pd)
 
 # ขั้นตอนที่ 12: การสร้างกราฟโดยใช้ Seaborn's lmplot
 plt.figure(figsize=(12, 6))

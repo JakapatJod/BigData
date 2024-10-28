@@ -13,10 +13,14 @@ spark = SparkSession.builder.appName("DecisionTreeRegression").getOrCreate()
 df = spark.read.format("csv").option("header", True).load("fb_live_thailand.csv")
 
 # แปลงคอลัมน์ num_reactions และ num_loves เป็นชนิดข้อมูล Double
-df = df.select(df.num_reactions.cast("Double"), df.num_loves.cast("Double"))
+df = df.select(df.num_reactions.cast("Double"), df.num_loves.cast("Double")) # Float 32 บิต Double 64 บิต
 
-# ลบแถวที่มีค่า null
+# ลบแถวที่มีค่า null ค่าว่าง (ถ้าnot null ไม่ว่าง)
 df = df.na.drop()
+# df = df.na.drop()               # ลบแถวที่มีค่า null ทั้งหมด
+# df = df.na.fill(0)              # แทนค่าที่เป็น null ด้วย 0 ในทุกคอลัมน์
+# df = df.na.fill({"age": 18})    # แทนค่าที่เป็น null ในคอลัมน์ "age" ด้วย 18
+
 
 # ใช้ StringIndexer เพื่อแปลงคอลัมน์ num_reactions และ num_loves เป็นค่าดัชนี
 indexer_reactions = StringIndexer(inputCol="num_reactions", outputCol="num_reactions_ind")
@@ -42,7 +46,8 @@ df_transformed = pipeline_model.transform(df)
 train_df, test_df = df_transformed.randomSplit([0.8, 0.2], seed=1234)
 
 # สร้างโมเดล Decision Tree Regressor พร้อมตั้งค่า hyperparameters
-dt_regressor = DecisionTreeRegressor(featuresCol="features", labelCol="num_loves_ind", maxDepth=30, minInstancesPerNode=2) # tune Model  maxDepth=30, minInstancesPerNode=2 ปรับตรงนี้
+dt_regressor = DecisionTreeRegressor(featuresCol="features", labelCol="num_loves_ind", maxDepth=30, minInstancesPerNode=2) 
+# tune Model  maxDepth=30, minInstancesPerNode=2 ปรับตรงนี้
 
 # ฝึกโมเดลด้วยชุดฝึก
 dt_model = dt_regressor.fit(train_df)

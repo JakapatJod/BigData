@@ -20,6 +20,9 @@ data = data.select(
     col("Rating").cast(IntegerType()).alias("Rating")  # แปลงคอลัมน์ "Rating" เป็นชนิด Integer และเปลี่ยนชื่อเป็น "Rating"
 )
 
+# trim() ใน PySpark ใช้สำหรับลบช่องว่าง (space) ที่อยู่ข้างหน้าและข้างหลังของข้อความในแต่ละแถวของคอลัมน์ 
+
+
 # กรองออกข้อมูลที่ ReviewText หรือ Rating เป็น null หรือว่างเปล่า
 data = data.filter(
     (col("ReviewText").isNotNull()) & (col("ReviewText") != "") & 

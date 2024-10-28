@@ -53,10 +53,13 @@ user_predictions = user_predictions.select("book_id", "user_id", "rating", "pred
 
 user_predictions.show(truncate=False)  # แสดงผลการทำนายทั้งหมดโดยไม่ตัดทอน
 
-# แสดง 5 หนังสือที่โมเดลแนะนำให้สำหรับผู้ใช้ทั้งหมด
+# แสดง 5 หนังสือที่โมเดลแนะนำให้สำหรับผู้ใช้ทั้งหมด recommendForAllUsers(5) เติมแล้วแต่่จำนวนกำหนดได้เลย
 user_recommendations = model.recommendForAllUsers(5)
 user_recommendations.show(truncate=False)
 
+# แสดงผู้ใช้ที่แนะนำ 5 รายสำหรับหนังสือทุกเล่ม recommendForAllItems(5) เติมแล้วแต่่จำนวนกำหนดได้เลย
+item_recommendations = model.recommendForAllItems(5)
+item_recommendations.show(truncate=False)
 
 # หยุดการทำงานของ SparkSession เมื่อเสร็จสิ้น
 spark.stop()

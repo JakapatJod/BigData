@@ -12,6 +12,7 @@ spark = SparkSession.builder \
     .appName("Text Classification") \
     .config("spark.executor.memory", "8g")\
     .config("spark.driver.memory", "8g")\
+    .config("spark.driver.extraJavaOptions", "-Dcom.github.fommil.netlib.BLAS=com.github.fommil.netlib.NativeRefBLAS")\
     .getOrCreate()  
 
 # อ่านข้อมูลจากไฟล์ CSV
